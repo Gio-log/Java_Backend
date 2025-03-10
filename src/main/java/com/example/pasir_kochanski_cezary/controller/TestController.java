@@ -16,4 +16,14 @@ public class TestController {
                 "message": "Witaj w aplikacji budżetowej stworzonej ze Spring
                 Boot!"}""";
     }
+    @GetMapping("/api/info")
+    public String info() {
+        return "Hello, World!"
+                +
+                """
+                {"appName": "Aplikacja Budżetowa",
+                "version": "1.0",
+                "message": "Witaj w aplikacji budżetowej stworzonej ze Spring
+                Boot!"}""";
+    }
 }
