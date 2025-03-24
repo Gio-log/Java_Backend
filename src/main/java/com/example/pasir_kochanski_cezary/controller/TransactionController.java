@@ -1,7 +1,10 @@
-package com.example.pasir_kochanski_cezary.controller;
+package com.example.pasir_kochanski_cezary.controllers;
 
 import com.example.pasir_kochanski_cezary.model.Transaction;
+import com.example.pasir_kochanski_cezary.dto.TransactionDTO;
 import com.example.pasir_kochanski_cezary.repository.TransactionRepository;
+import com.example.pasir_kochanski_cezary.services.TransactionService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,34 +18,36 @@ public class TransactionController {
     @Autowired
     private TransactionRepository transactionRepository;
 
+    private final TransactionService transactionService;
+    public TransactionController(TransactionService transactionService){
+        this.transactionService = transactionService;
+    }
+
     @GetMapping
     public ResponseEntity<List<Transaction>> getAllTransactions() {
-        List<Transaction> transactions = transactionRepository.findAll();
-        return ResponseEntity.ok(transactions);
+        return ResponseEntity.ok(transactionService.getAllTransactions());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Transaction> getTransactionById(@PathVariable Long id) {
+        return ResponseEntity.ok(transactionService.getTransactionById(id));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Transaction> updateTransaction(@PathVariable Long id, @RequestBody Transaction transactionDetails) {
-        Transaction transaction = transactionRepository.findById(id).orElseThrow(() -> new RuntimeException("Transaction id not found with id "+ id));
-        transaction.setAmount(transactionDetails.getAmount());
-        transaction.setType(transactionDetails.getType());
-        transaction.setTags(transactionDetails.getTags());
-        transaction.setNotes(transactionDetails.getNotes());
-        Transaction updatedTransaction = transactionRepository.save(transaction);
-        return ResponseEntity.ok(updatedTransaction);
+    public ResponseEntity<Transaction> updateTransaction(@PathVariable Long id, @Valid @RequestBody TransactionDTO transactionDTO) {
+       return ResponseEntity.ok(transactionService.updateTransaction(id, transactionDTO));
     }
 
     @PostMapping
-    public ResponseEntity<Transaction> createTransaction(@RequestBody Transaction transactionDetails) {
-        Transaction transaction = transactionRepository.save(transactionDetails);
-        return ResponseEntity.ok(transaction);
+    public ResponseEntity<Transaction> createTransaction(@Valid @RequestBody TransactionDTO transactionDetails) {
+        return ResponseEntity.ok(transactionService.createTransaction(transactionDetails));
     }
 
+
+
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteTransaction(@PathVariable Long id) {
-        Transaction transaction = transactionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Transaction id not found with id " + id));
-        transactionRepository.delete(transaction);
-        return ResponseEntity.ok("Transaction deleted successfully.");
+    public ResponseEntity<Void> deleteTransaction(@PathVariable Long id) {
+        transactionService.deleteTransaction(id);
+        return ResponseEntity.noContent().build();
     }
 }
