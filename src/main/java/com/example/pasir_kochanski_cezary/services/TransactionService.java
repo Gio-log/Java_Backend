@@ -3,8 +3,11 @@ package com.example.pasir_kochanski_cezary.services;
 import com.example.pasir_kochanski_cezary.model.Transaction;
 import com.example.pasir_kochanski_cezary.dto.TransactionDTO;
 import com.example.pasir_kochanski_cezary.model.TransactionType;
+import com.example.pasir_kochanski_cezary.model.User;
 import com.example.pasir_kochanski_cezary.repository.TransactionRepository;
+import com.example.pasir_kochanski_cezary.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,14 +16,21 @@ import java.util.List;
 public class TransactionService
 {
     private final TransactionRepository transactionRepository;
+    private final UserRepository userRepository;
+    private User getCurrentUser() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        return userRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("Nie znaleziono zalogowanego użytkownika"));
+    }
 
-    public TransactionService(TransactionRepository transactionRepository) {
+    public TransactionService(TransactionRepository transactionRepository, UserRepository userRepository) {
         this.transactionRepository = transactionRepository;
+        this.userRepository = userRepository;
     }
 
     public List<Transaction> getAllTransactions()
     {
-        return transactionRepository.findAll();
+        User user = getCurrentUser();
+        return transactionRepository.findAllByUser(user);
     }
 
     public Transaction getTransactionById(long id)
@@ -43,13 +53,12 @@ public class TransactionService
     }
 
     public Transaction createTransaction(TransactionDTO transactionDetails) {
-        Transaction transaction = new Transaction(
-                transactionDetails.getAmount(),
-                TransactionType.valueOf(transactionDetails.getType()),
-                transactionDetails.getTags(),
-                transactionDetails.getNotes()
-        );
-
+        Transaction transaction = new Transaction();
+        transaction.setAmount(transactionDetails.getAmount());
+        transaction.setType(TransactionType.valueOf(transactionDetails.getType()));
+        transaction.setTags(transactionDetails.getTags());
+        transaction.setNotes(transactionDetails.getNotes());
+        transaction.setUser(getCurrentUser());
 
 
         Transaction savedTransaction = transactionRepository.save(transaction);

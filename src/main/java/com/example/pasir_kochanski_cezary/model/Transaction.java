@@ -31,11 +31,16 @@ public class Transaction {
 
     private LocalDateTime timestamp;
 
-    public Transaction(Double amount, TransactionType type, String tags, String notes) {
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    public Transaction(Double amount, TransactionType type, String tags, User user, String notes) {
         this.amount = amount;
         this.type = type;
         this.tags = tags;
         this.notes = notes;
+        this.user = user;
         this.timestamp = LocalDateTime.now();
     }
 
