@@ -1,14 +1,21 @@
 package com.example.pasir_kochanski_cezary.model;
 
 import jakarta.persistence.*;
-
 import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
+
+
 
 @Entity
-@Table(name = "transactions")
-
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name="transactions")
 public class Transaction {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -16,7 +23,7 @@ public class Transaction {
     private Double amount;
 
     @Enumerated(EnumType.STRING)
-    private TranscriptionType type;
+    private TransactionType type;
 
     private String tags;
 
@@ -24,58 +31,12 @@ public class Transaction {
 
     private LocalDateTime timestamp;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setAmount(Double amount) {
+    public Transaction(Double amount, TransactionType type, String tags, String notes) {
         this.amount = amount;
-    }
-
-    public void setType(TranscriptionType type) {
         this.type = type;
-    }
-
-    public void setTags(String tags) {
         this.tags = tags;
-    }
-
-    public void setNotes(String notes) {
         this.notes = notes;
+        this.timestamp = LocalDateTime.now();
     }
 
-    public void setTimestamp(LocalDateTime timestamp) {
-        this.timestamp = timestamp;
-    }
-
-    public LocalDateTime getTimestamp() {
-        return timestamp;
-    }
-
-    public String getNotes() {
-        return notes;
-    }
-
-    public String getTags() {
-        return tags;
-    }
-
-    public TranscriptionType getType() {
-        return type;
-    }
-
-    public Double getAmount() {
-        return amount;
-    }
-
-    public Transaction() {
-    }
-
-    public Transaction(LocalDateTime timestamp, String notes, String tags, TranscriptionType type, Double amount) {
-        this.timestamp = timestamp;
-        this.notes = notes;
-        this.tags = tags;
-        this.type = type;
-        this.amount = amount;
-    }
 }
