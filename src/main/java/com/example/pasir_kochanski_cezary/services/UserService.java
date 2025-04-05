@@ -6,13 +6,17 @@ import com.example.pasir_kochanski_cezary.model.User;
 import com.example.pasir_kochanski_cezary.repository.UserRepository;
 import com.example.pasir_kochanski_cezary.security.JwtUtil;
 import org.springframework.security.authentication. BadCredentialsException;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password. PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+
 
 @Service
-public class UserService {
+public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final PasswordEncoder encoder;
     private final JwtUtil jwtUtil;
@@ -39,5 +43,15 @@ public class UserService {
             throw new BadCredentialsException("Nieprawidłowe dane logowania");
         }
         return jwtUtil.generateToken(user.getEmail());
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("Nie znaleziono Użytkownika: " + email));
+        return new org.springframework.security.core.userdetails.User(
+                user.getEmail(),
+                user.getPassword(),
+                new ArrayList<>()
+        );
     }
 }

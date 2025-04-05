@@ -44,6 +44,10 @@ public class TransactionService
         Transaction transaction = transactionRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Nie znaleziono transakcji o ID " + id));
 
+        if (!transaction.getUser().getEmail().equals(getCurrentUser().getEmail())) {
+            throw new SecurityException("Brak dostępu do edycji tej transakcji");
+        }
+
         transaction.setAmount(transactionDTO.getAmount());
         transaction.setType(TransactionType.valueOf(transactionDTO.getType()));
         transaction.setTags(transactionDTO.getTags());
@@ -69,6 +73,10 @@ public class TransactionService
     public void deleteTransaction(Long id) {
         Transaction transaction = transactionRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Transaction not found with id " + id));
+
+        if (!transaction.getUser().getEmail().equals(getCurrentUser().getEmail())) {
+            throw new SecurityException("Brak dostępu do edycji tej transakcji");
+        }
 
         transactionRepository.delete(transaction);
     }
