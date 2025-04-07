@@ -1,0 +1,24 @@
+type Query {
+    transactions: [Transaction]
+}
+
+type Mutation {
+    addTransaction(TransactionDTO: TransactionInput!): Transaction
+    updateTransaction(id:ID!, transactionDTO: TransactionInput!): Transaction
+    deleteTransaction(is:ID!): Boolean
+}
+
+type Transaction {
+    id: ID
+    amount: Float
+    type: String
+    tags: String
+    notes: String
+}
+
+input TransactionInput{
+    amount: Float!
+    type: String!
+    tags: String!
+    notes: String
+}
