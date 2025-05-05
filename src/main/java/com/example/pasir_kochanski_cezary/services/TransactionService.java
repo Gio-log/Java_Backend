@@ -1,5 +1,6 @@
 package com.example.pasir_kochanski_cezary.services;
 
+import com.example.pasir_kochanski_cezary.dto.BalanceDTO;
 import com.example.pasir_kochanski_cezary.model.Transaction;
 import com.example.pasir_kochanski_cezary.dto.TransactionDTO;
 import com.example.pasir_kochanski_cezary.model.TransactionType;
@@ -10,6 +11,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -17,7 +19,7 @@ public class TransactionService
 {
     private final TransactionRepository transactionRepository;
     private final UserRepository userRepository;
-    private User getCurrentUser() {
+    public User getCurrentUser() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         return userRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("Nie znaleziono zalogowanego użytkownika"));
     }
@@ -25,6 +27,22 @@ public class TransactionService
     public TransactionService(TransactionRepository transactionRepository, UserRepository userRepository) {
         this.transactionRepository = transactionRepository;
         this.userRepository = userRepository;
+    }
+    public BalanceDTO getUserBalance(User user) {
+        List<Transaction> userTransactions = transactionRepository.findByUser((user));
+
+        double income = userTransactions.stream()
+                .filter(t -> t.getType() == TransactionType.INCOME)
+                .mapToDouble(Transaction::getAmount)
+                .sum();
+
+        double expense = userTransactions.stream()
+                .filter(t -> t.getType() == TransactionType.EXPENSE)
+                .mapToDouble(Transaction::getAmount)
+                .sum();
+
+
+        return new BalanceDTO(income, expense, income - expense);
     }
 
     public List<Transaction> getAllTransactions()
@@ -63,6 +81,7 @@ public class TransactionService
         transaction.setTags(transactionDetails.getTags());
         transaction.setNotes(transactionDetails.getNotes());
         transaction.setUser(getCurrentUser());
+        transaction.setTimestamp(LocalDateTime.now());
 
 
         Transaction savedTransaction = transactionRepository.save(transaction);

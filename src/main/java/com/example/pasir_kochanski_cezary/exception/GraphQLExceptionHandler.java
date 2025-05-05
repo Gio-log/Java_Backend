@@ -11,11 +11,13 @@ import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.constraints.NotNull;
 import org.hibernate.exception.DataException;
 import org.springframework.graphql.execution.DataFetcherExceptionResolver;
+import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Component
 public class GraphQLExceptionHandler implements DataFetcherExceptionResolver {
 
     @Override

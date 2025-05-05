@@ -1,7 +1,9 @@
 package com.example.pasir_kochanski_cezary.controller;
 
+import com.example.pasir_kochanski_cezary.dto.BalanceDTO;
 import com.example.pasir_kochanski_cezary.dto.TransactionDTO;
 import com.example.pasir_kochanski_cezary.model.Transaction;
+import com.example.pasir_kochanski_cezary.model.User;
 import com.example.pasir_kochanski_cezary.services.TransactionService;
 import jakarta.validation.Valid;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -31,13 +33,18 @@ public class TransactionGraphQLController {
     }
 
     @MutationMapping
-    public Transaction updateTransaction(@Valid Long id,@Valid @Argument TransactionDTO transactionDTO) {
+    public Transaction updateTransaction(@Valid @Argument Long id,@Valid @Argument TransactionDTO transactionDTO) {
         return transactionService.updateTransaction(id, transactionDTO);
     }
 
     @MutationMapping
-    public Transaction deleteTransaction(@Valid Long id,@Valid @Argument Transaction transaction) {
+    public Boolean deleteTransaction(@Valid @Argument Long id) {
         transactionService.deleteTransaction(id);
-        return transaction;
+        return true;
+    }
+    @QueryMapping
+    public BalanceDTO userBalance(@Argument Double days) {
+        User user = transactionService.getCurrentUser();
+        return transactionService.getUserBalance(user);
     }
 }

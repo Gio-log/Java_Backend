@@ -1,11 +1,18 @@
 type Query {
     transactions: [Transaction]
+    userBalance(days: Float): BalanceDto
+}
+
+type BalanceDto {
+    totalIncome: Float!
+    totalExpense: Float!
+    balance: Float!
 }
 
 type Mutation {
-    addTransaction(TransactionDTO: TransactionInput!): Transaction
+    addTransaction(transactionDTO: TransactionInput!): Transaction
     updateTransaction(id:ID!, transactionDTO: TransactionInput!): Transaction
-    deleteTransaction(is:ID!): Boolean
+    deleteTransaction(id:ID!): Boolean
 }
 
 type Transaction {
@@ -14,6 +21,7 @@ type Transaction {
     type: String
     tags: String
     notes: String
+    timestamp: String
 }
 
 input TransactionInput{
