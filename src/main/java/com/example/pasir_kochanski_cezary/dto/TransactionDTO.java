@@ -26,6 +26,5 @@ public class TransactionDTO {
     @Size(max = 255, message = "Notatka może mieć maksymalnie 255 znaków")
     private String notes;
 
-//    @Setter
 //    private LocalDateTime timestamp;
 }
